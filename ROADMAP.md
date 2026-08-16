@@ -29,17 +29,18 @@ graph TD
 
 ## Detailed Phases
 
-### Phase 1: Repository and Architecture (Current)
+### Phase 1: Repository and Architecture (COMPLETE)
 *   **Goal**: Setup folders, basic configurations, docker infrastructure, and base roadmap.
 *   **Success Criteria**: All folders created, docker compose parses successfully, roadmap approved.
 
-### Phase 2: PostgreSQL + PostGIS Schema Design
+### Phase 2: PostgreSQL + PostGIS Schema Design (COMPLETE)
 *   **Goal**: Create tables for administrative wards, OSM infrastructure, environmental readings, and ML predictions.
 *   **Success Criteria**: SQL schema files written, spatial indexes created, migrations tested.
 
-### Phase 3: Bhubaneswar GIS Ingestion
+### Phase 3: Bhubaneswar GIS Ingestion (Current)
 *   **Goal**: Automate downloading and validation of GIS data (Wards, Roads, POIs).
 *   **Success Criteria**: Validated geometry inside PostGIS, zero duplicate errors, correct projection (EPSG:4326/32645).
+
 
 ### Phase 4: 2D Interactive Map
 *   **Goal**: Render Bhubaneswar wards, roads, and POIs in a Next.js + MapLibre GL JS frontend.
