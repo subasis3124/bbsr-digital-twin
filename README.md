@@ -61,6 +61,29 @@ docker compose -f docker/docker-compose.yml up -d
 - PostgreSQL/PostGIS will listen on port `5432`.
 - MLflow dashboard will be accessible at [http://localhost:5000](http://localhost:5000).
 
+### 4. Setup Python Environment and Run Migrations
+```bash
+# Create and activate virtual environment
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1   # On Windows (PowerShell)
+source .venv/bin/activate       # On Linux/macOS
+
+# Install backend dependencies
+pip install -r backend/requirements.txt
+
+# Run migrations to create tables
+cd backend
+alembic upgrade head
+cd ..
+```
+
+### 5. Run FastAPI backend
+```bash
+uvicorn backend.app.main:app --reload --port 8000
+```
+The API documentation will be interactive and accessible at [http://localhost:8000/docs](http://localhost:8000/docs).
+
+
 ---
 
 ## 📚 Project Roadmap

@@ -48,6 +48,25 @@ The backend is a RESTful API and execution engine.
     *   **Simulation Engine**: Translates user inputs (e.g., "rainfall + 30%") into updated environment arrays, runs ML prediction wrappers, computes downstream metrics, and returns Delta states.
     *   **Optimization Engine**: Packages active risk estimates into linear programs and calls **Google OR-Tools** to return optimal resource locations.
 
+### Request Flow Pattern
+The typical flow of a spatial data query in Phase 2 runs as follows:
+```text
+User Action (Click Ward)
+   ↓
+Frontend (Zustand state triggers fetch /api/v1/wards/42)
+   ↓
+FastAPI Router (Interprets endpoint, calls get_db Session dependency)
+   ↓
+SQLAlchemy ORM (Translates Python DB query to SQL with spatial projections)
+   ↓
+PostgreSQL + PostGIS (Executes query, extracts geometry and attributes)
+   ↓
+GeoJSON Serializer (FastAPI serializes PostGIS WKB to standard GeoJSON Feature)
+   ↓
+Frontend Map (MapLibre GL JS renders the GeoJSON polygon on the map)
+```
+
+
 ---
 
 ## 🗄️ 3. Database Layer (`/database`)
