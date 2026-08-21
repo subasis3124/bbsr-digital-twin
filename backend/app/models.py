@@ -10,7 +10,7 @@ class City(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(100), nullable=False, default="Bhubaneswar")
-    geom = Column(Geometry(geometry_type="POLYGON", srid=4326), nullable=False)
+    geom = Column(Geometry(geometry_type="POLYGON", srid=4326, spatial_index=False), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
@@ -22,7 +22,7 @@ class Ward(Base):
     ward_number = Column(Integer, unique=True, nullable=False, index=True)
     name = Column(String(150))
     population_est = Column(Integer)
-    geom = Column(Geometry(geometry_type="MULTIPOLYGON", srid=4326), nullable=False)
+    geom = Column(Geometry(geometry_type="MULTIPOLYGON", srid=4326, spatial_index=False), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 # 3. Road Model
@@ -36,7 +36,7 @@ class Road(Base):
     lanes = Column(Integer, default=1)
     maxspeed = Column(Integer)
     oneway = Column(Boolean, default=False)
-    geom = Column(Geometry(geometry_type="LINESTRING", srid=4326), nullable=False)
+    geom = Column(Geometry(geometry_type="LINESTRING", srid=4326, spatial_index=False), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     traffic_observations = relationship("Traffic", back_populates="road", cascade="all, delete-orphan")
@@ -50,7 +50,7 @@ class Building(Base):
     building_type = Column(String(100))
     height = Column(Numeric)
     levels = Column(Integer)
-    geom = Column(Geometry(geometry_type="POLYGON", srid=4326), nullable=False)
+    geom = Column(Geometry(geometry_type="POLYGON", srid=4326, spatial_index=False), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 # 5. Hospital Model
@@ -61,7 +61,7 @@ class Hospital(Base):
     osm_id = Column(Numeric, unique=True, index=True)
     name = Column(String(250), nullable=False)
     beds = Column(Integer, default=0)
-    geom = Column(Geometry(geometry_type="POINT", srid=4326), nullable=False)
+    geom = Column(Geometry(geometry_type="POINT", srid=4326, spatial_index=False), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 # 6. School Model
@@ -71,7 +71,7 @@ class School(Base):
     id = Column(Integer, primary_key=True, index=True)
     osm_id = Column(Numeric, unique=True, index=True)
     name = Column(String(250), nullable=False)
-    geom = Column(Geometry(geometry_type="POINT", srid=4326), nullable=False)
+    geom = Column(Geometry(geometry_type="POINT", srid=4326, spatial_index=False), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 # 7. BusStop Model
@@ -81,7 +81,7 @@ class BusStop(Base):
     id = Column(Integer, primary_key=True, index=True)
     osm_id = Column(Numeric, unique=True, index=True)
     name = Column(String(250))
-    geom = Column(Geometry(geometry_type="POINT", srid=4326), nullable=False)
+    geom = Column(Geometry(geometry_type="POINT", srid=4326, spatial_index=False), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 # 8. BusRoute Model
@@ -91,7 +91,7 @@ class BusRoute(Base):
     id = Column(Integer, primary_key=True, index=True)
     route_name = Column(String(100), nullable=False)
     operator = Column(String(100), default="CRUT")
-    geom = Column(Geometry(geometry_type="LINESTRING", srid=4326), nullable=False)
+    geom = Column(Geometry(geometry_type="LINESTRING", srid=4326, spatial_index=False), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 # 9. WaterBody Model
@@ -102,7 +102,7 @@ class WaterBody(Base):
     osm_id = Column(Numeric, unique=True, index=True)
     name = Column(String(150))
     water_type = Column(String(50))
-    geom = Column(Geometry(geometry_type="POLYGON", srid=4326), nullable=False)
+    geom = Column(Geometry(geometry_type="POLYGON", srid=4326, spatial_index=False), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 # 10. Weather Model
@@ -132,7 +132,7 @@ class AirQuality(Base):
     so2 = Column(Numeric)
     o3 = Column(Numeric)
     aqi_value = Column(Integer)
-    geom = Column(Geometry(geometry_type="POINT", srid=4326), nullable=False)
+    geom = Column(Geometry(geometry_type="POINT", srid=4326, spatial_index=False), nullable=False)
     source = Column(String(100), nullable=False)
 
 # 12. Traffic Model
@@ -154,7 +154,7 @@ class PopulationGrid(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     population_count = Column(Integer, nullable=False)
-    geom = Column(Geometry(geometry_type="POLYGON", srid=4326), nullable=False)
+    geom = Column(Geometry(geometry_type="POLYGON", srid=4326, spatial_index=False), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 # 14. FloodEvent Model
@@ -166,7 +166,7 @@ class FloodEvent(Base):
     start_time = Column(DateTime(timezone=True), nullable=False)
     end_time = Column(DateTime(timezone=True))
     severity = Column(String(50))
-    geom = Column(Geometry(geometry_type="MULTIPOLYGON", srid=4326), nullable=False)
+    geom = Column(Geometry(geometry_type="MULTIPOLYGON", srid=4326, spatial_index=False), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 # 15. SpatialGridCell Model
@@ -175,8 +175,8 @@ class SpatialGridCell(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     cell_code = Column(String(50), unique=True, nullable=False, index=True)
-    geom = Column(Geometry(geometry_type="POLYGON", srid=4326), nullable=False)
-    centroid = Column(Geometry(geometry_type="POINT", srid=4326), nullable=False)
+    geom = Column(Geometry(geometry_type="POLYGON", srid=4326, spatial_index=False), nullable=False)
+    centroid = Column(Geometry(geometry_type="POINT", srid=4326, spatial_index=False), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     satellite_features = relationship("SatelliteFeature", back_populates="grid_cell", cascade="all, delete-orphan")

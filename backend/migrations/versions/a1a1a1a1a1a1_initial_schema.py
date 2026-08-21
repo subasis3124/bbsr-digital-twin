@@ -25,7 +25,7 @@ def upgrade() -> None:
         'city',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('name', sa.String(length=100), nullable=False),
-        sa.Column('geom', geoalchemy2.types.Geometry(geometry_type='POLYGON', srid=4326, from_text='ST_GeomFromEWKT', name='geometry'), nullable=False),
+        sa.Column('geom', geoalchemy2.types.Geometry(geometry_type='POLYGON', srid=4326, from_text='ST_GeomFromEWKT', name='geometry', spatial_index=False), nullable=False),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
         sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
         sa.PrimaryKeyConstraint('id')
@@ -39,7 +39,7 @@ def upgrade() -> None:
         sa.Column('ward_number', sa.Integer(), nullable=False),
         sa.Column('name', sa.String(length=150), nullable=True),
         sa.Column('population_est', sa.Integer(), nullable=True),
-        sa.Column('geom', geoalchemy2.types.Geometry(geometry_type='MULTIPOLYGON', srid=4326, from_text='ST_GeomFromEWKT', name='geometry'), nullable=False),
+        sa.Column('geom', geoalchemy2.types.Geometry(geometry_type='MULTIPOLYGON', srid=4326, from_text='ST_GeomFromEWKT', name='geometry', spatial_index=False), nullable=False),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
         sa.PrimaryKeyConstraint('id')
     )
@@ -56,7 +56,7 @@ def upgrade() -> None:
         sa.Column('lanes', sa.Integer(), nullable=True),
         sa.Column('maxspeed', sa.Integer(), nullable=True),
         sa.Column('oneway', sa.Boolean(), nullable=True),
-        sa.Column('geom', geoalchemy2.types.Geometry(geometry_type='LINESTRING', srid=4326, from_text='ST_GeomFromEWKT', name='geometry'), nullable=False),
+        sa.Column('geom', geoalchemy2.types.Geometry(geometry_type='LINESTRING', srid=4326, from_text='ST_GeomFromEWKT', name='geometry', spatial_index=False), nullable=False),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
         sa.PrimaryKeyConstraint('id')
     )
@@ -71,7 +71,7 @@ def upgrade() -> None:
         sa.Column('building_type', sa.String(length=100), nullable=True),
         sa.Column('height', sa.Numeric(), nullable=True),
         sa.Column('levels', sa.Integer(), nullable=True),
-        sa.Column('geom', geoalchemy2.types.Geometry(geometry_type='POLYGON', srid=4326, from_text='ST_GeomFromEWKT', name='geometry'), nullable=False),
+        sa.Column('geom', geoalchemy2.types.Geometry(geometry_type='POLYGON', srid=4326, from_text='ST_GeomFromEWKT', name='geometry', spatial_index=False), nullable=False),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
         sa.PrimaryKeyConstraint('id')
     )
@@ -85,7 +85,7 @@ def upgrade() -> None:
         sa.Column('osm_id', sa.Numeric(), nullable=True),
         sa.Column('name', sa.String(length=250), nullable=False),
         sa.Column('beds', sa.Integer(), nullable=True),
-        sa.Column('geom', geoalchemy2.types.Geometry(geometry_type='POINT', srid=4326, from_text='ST_GeomFromEWKT', name='geometry'), nullable=False),
+        sa.Column('geom', geoalchemy2.types.Geometry(geometry_type='POINT', srid=4326, from_text='ST_GeomFromEWKT', name='geometry', spatial_index=False), nullable=False),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
         sa.PrimaryKeyConstraint('id')
     )
@@ -98,7 +98,7 @@ def upgrade() -> None:
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('osm_id', sa.Numeric(), nullable=True),
         sa.Column('name', sa.String(length=250), nullable=False),
-        sa.Column('geom', geoalchemy2.types.Geometry(geometry_type='POINT', srid=4326, from_text='ST_GeomFromEWKT', name='geometry'), nullable=False),
+        sa.Column('geom', geoalchemy2.types.Geometry(geometry_type='POINT', srid=4326, from_text='ST_GeomFromEWKT', name='geometry', spatial_index=False), nullable=False),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
         sa.PrimaryKeyConstraint('id')
     )
@@ -111,7 +111,7 @@ def upgrade() -> None:
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('osm_id', sa.Numeric(), nullable=True),
         sa.Column('name', sa.String(length=250), nullable=True),
-        sa.Column('geom', geoalchemy2.types.Geometry(geometry_type='POINT', srid=4326, from_text='ST_GeomFromEWKT', name='geometry'), nullable=False),
+        sa.Column('geom', geoalchemy2.types.Geometry(geometry_type='POINT', srid=4326, from_text='ST_GeomFromEWKT', name='geometry', spatial_index=False), nullable=False),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
         sa.PrimaryKeyConstraint('id')
     )
@@ -124,7 +124,7 @@ def upgrade() -> None:
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('route_name', sa.String(length=100), nullable=False),
         sa.Column('operator', sa.String(length=100), nullable=True),
-        sa.Column('geom', geoalchemy2.types.Geometry(geometry_type='LINESTRING', srid=4326, from_text='ST_GeomFromEWKT', name='geometry'), nullable=False),
+        sa.Column('geom', geoalchemy2.types.Geometry(geometry_type='LINESTRING', srid=4326, from_text='ST_GeomFromEWKT', name='geometry', spatial_index=False), nullable=False),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
         sa.PrimaryKeyConstraint('id')
     )
@@ -137,7 +137,7 @@ def upgrade() -> None:
         sa.Column('osm_id', sa.Numeric(), nullable=True),
         sa.Column('name', sa.String(length=150), nullable=True),
         sa.Column('water_type', sa.String(length=50), nullable=True),
-        sa.Column('geom', geoalchemy2.types.Geometry(geometry_type='POLYGON', srid=4326, from_text='ST_GeomFromEWKT', name='geometry'), nullable=False),
+        sa.Column('geom', geoalchemy2.types.Geometry(geometry_type='POLYGON', srid=4326, from_text='ST_GeomFromEWKT', name='geometry', spatial_index=False), nullable=False),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
         sa.PrimaryKeyConstraint('id')
     )
@@ -172,7 +172,7 @@ def upgrade() -> None:
         sa.Column('so2', sa.Numeric(), nullable=True),
         sa.Column('o3', sa.Numeric(), nullable=True),
         sa.Column('aqi_value', sa.Integer(), nullable=True),
-        sa.Column('geom', geoalchemy2.types.Geometry(geometry_type='POINT', srid=4326, from_text='ST_GeomFromEWKT', name='geometry'), nullable=False),
+        sa.Column('geom', geoalchemy2.types.Geometry(geometry_type='POINT', srid=4326, from_text='ST_GeomFromEWKT', name='geometry', spatial_index=False), nullable=False),
         sa.Column('source', sa.String(length=100), nullable=False),
         sa.PrimaryKeyConstraint('id')
     )
@@ -199,7 +199,7 @@ def upgrade() -> None:
         'population',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('population_count', sa.Integer(), nullable=False),
-        sa.Column('geom', geoalchemy2.types.Geometry(geometry_type='POLYGON', srid=4326, from_text='ST_GeomFromEWKT', name='geometry'), nullable=False),
+        sa.Column('geom', geoalchemy2.types.Geometry(geometry_type='POLYGON', srid=4326, from_text='ST_GeomFromEWKT', name='geometry', spatial_index=False), nullable=False),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
         sa.PrimaryKeyConstraint('id')
     )
@@ -213,7 +213,7 @@ def upgrade() -> None:
         sa.Column('start_time', sa.DateTime(timezone=True), nullable=False),
         sa.Column('end_time', sa.DateTime(timezone=True), nullable=True),
         sa.Column('severity', sa.String(length=50), nullable=True),
-        sa.Column('geom', geoalchemy2.types.Geometry(geometry_type='MULTIPOLYGON', srid=4326, from_text='ST_GeomFromEWKT', name='geometry'), nullable=False),
+        sa.Column('geom', geoalchemy2.types.Geometry(geometry_type='MULTIPOLYGON', srid=4326, from_text='ST_GeomFromEWKT', name='geometry', spatial_index=False), nullable=False),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
         sa.PrimaryKeyConstraint('id')
     )
@@ -224,8 +224,8 @@ def upgrade() -> None:
         'spatial_grid_cells',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('cell_code', sa.String(length=50), nullable=False),
-        sa.Column('geom', geoalchemy2.types.Geometry(geometry_type='POLYGON', srid=4326, from_text='ST_GeomFromEWKT', name='geometry'), nullable=False),
-        sa.Column('centroid', geoalchemy2.types.Geometry(geometry_type='POINT', srid=4326, from_text='ST_GeomFromEWKT', name='geometry'), nullable=False),
+        sa.Column('geom', geoalchemy2.types.Geometry(geometry_type='POLYGON', srid=4326, from_text='ST_GeomFromEWKT', name='geometry', spatial_index=False), nullable=False),
+        sa.Column('centroid', geoalchemy2.types.Geometry(geometry_type='POINT', srid=4326, from_text='ST_GeomFromEWKT', name='geometry', spatial_index=False), nullable=False),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
         sa.PrimaryKeyConstraint('id')
     )
