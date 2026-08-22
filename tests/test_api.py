@@ -141,3 +141,23 @@ def test_get_building_by_id_not_found():
     response = client.get("/api/v1/buildings/9999")
     assert response.status_code == 404
     assert "not found" in response.json()["detail"].lower()
+
+
+def test_get_hospitals_empty():
+    """
+    Verifies that fetching hospitals returns an empty GeoJSON FeatureCollection when no records exist.
+    """
+    response = client.get("/api/v1/hospitals")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["type"] == "FeatureCollection"
+    assert len(data["features"]) == 0
+
+
+def test_get_hospital_by_id_not_found():
+    """
+    Verifies that querying a non-existent hospital ID returns 404 Not Found.
+    """
+    response = client.get("/api/v1/hospitals/9999")
+    assert response.status_code == 404
+    assert "not found" in response.json()["detail"].lower()

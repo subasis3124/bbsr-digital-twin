@@ -1,8 +1,9 @@
 import pytest
-from shapely.geometry import Polygon, MultiPolygon
+from shapely.geometry import Point, Polygon, MultiPolygon
 from pipelines.ingest_wards import validate_and_normalize_feature
 from pipelines.ingest_roads import parse_lanes, parse_maxspeed, parse_oneway
 from pipelines.ingest_buildings import parse_height, parse_levels
+from pipelines.ingest_hospitals import parse_beds, parse_geometry
 
 def test_validate_and_normalize_valid_polygon():
     """
@@ -124,3 +125,43 @@ def test_parse_levels():
     assert parse_levels("4") == 4
     assert parse_levels("ground+2") == 2  # Extract first digit sequence found
     assert parse_levels("invalid_levels") is None
+
+def test_parse_beds():
+    """
+    Verifies that hospital bed capacity numbers are parsed correctly.
+    """
+    assert parse_beds({}) is None
+    assert parse_beds({"beds": 50}) == 50
+    assert parse_beds({"beds": "100"}) == 100
+    assert parse_beds({"healthcare:beds": "250"}) == 250
+    assert parse_beds({"beds": "approx 30 beds"}) == 30
+    assert parse_beds({"beds": "none"}) is None
+
+def test_parse_geometry():
+    """
+    Verifies that OSM geometries (Nodes, Ways) are parsed and converted to Point.
+    """
+    # 1. Test Node (Point)
+    node = {"type": "node", "id": 1, "lat": 20.25, "lon": 85.83}
+    pt = parse_geometry(node)
+    assert isinstance(pt, Point)
+    assert pt.x == 85.83
+    assert pt.y == 20.25
+
+    # 2. Test Way (Polygon Centroid)
+    way = {
+        "type": "way",
+        "id": 2,
+        "geometry": [
+            {"lat": 20.2, "lon": 85.8},
+            {"lat": 20.3, "lon": 85.8},
+            {"lat": 20.3, "lon": 85.9},
+            {"lat": 20.2, "lon": 85.9},
+            {"lat": 20.2, "lon": 85.8}
+        ]
+    }
+    pt2 = parse_geometry(way)
+    assert isinstance(pt2, Point)
+    assert pt2.x == pytest.approx(85.85)
+    assert pt2.y == pytest.approx(20.25)
+

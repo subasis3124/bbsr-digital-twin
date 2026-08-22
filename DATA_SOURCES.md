@@ -42,8 +42,21 @@ To build a technically credible and data-driven digital twin, we list here the e
     - `building:levels` (Parsed integer levels count) -> `buildings.levels`
 *   **Limitations**: Height and building:levels are sparsely populated on OSM; missing values are correctly loaded as NULL in the database without fabrication. Complex MultiPolygon relations are normalized to the largest component Polygon to ensure `osm_id` uniqueness and schema conformance.
 
-### 4. Infrastructure Points of Interest (POIs)
-*   **Components**: Hospitals, schools, and bus stops.
+### 4. Healthcare Facilities (OSM POIs)
+*   **Source**: OpenStreetMap (OSM) contributors via Overpass API (`https://overpass-api.de/api/interpreter`).
+*   **Extraction Date**: 2026-08-22
+*   **Geographic Scope**: Bhubaneswar bounding box `[20.211, 85.732, 20.367, 85.904]`, spatially filtered by BMC ward boundaries.
+*   **Number of Features**: 224 elements read; 209 elements geographically relevant and ingested into database.
+*   **CRS**: EPSG:4326 (WGS 84 coordinate system).
+*   **License**: Open Database License (ODbL). Requires the attribution: "© OpenStreetMap contributors".
+*   **Attribute Mapping**:
+    - `id` (OSM Way/Node/Relation ID) -> `hospitals.osm_id`
+    - `name` (Healthcare facility name) -> `hospitals.name` (strictly required, empty names skipped)
+    - `beds` / `healthcare:beds` (Parsed bed count) -> `hospitals.beds`
+*   **Limitations**: Bed counts are sparsely populated in OSM; missing values are loaded as NULL in the database without fabrication. Polygon boundaries (e.g., hospital campuses) are normalized to their centroid Point geometries.
+
+### 5. Infrastructure Points of Interest (POIs)
+*   **Components**: Schools and bus stops.
 *   **Source**: OpenStreetMap (OSM) via Overpass API.
 *   **Format**: GeoJSON (EPSG:4326)
 *   **License**: Open Database License (ODbL).

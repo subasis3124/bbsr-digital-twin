@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.app.routes import health, cities, wards, roads, buildings
+from backend.app.routes import health, cities, wards, roads, buildings, hospitals
 
 app = FastAPI(
     title="BBSR Digital Twin API",
@@ -24,6 +24,8 @@ app.include_router(cities.router)
 app.include_router(wards.router)
 app.include_router(roads.router)
 app.include_router(buildings.router)
+app.include_router(hospitals.router)
+
 
 
 
