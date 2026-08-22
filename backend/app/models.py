@@ -76,6 +76,28 @@ class School(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 
+# 6.1. PoliceStation Model
+class PoliceStation(Base):
+    __tablename__ = "police_stations"
+
+    id = Column(Integer, primary_key=True, index=True)
+    osm_id = Column(Numeric, unique=True, index=True)
+    name = Column(String(250), nullable=False)
+    geom = Column(Geometry(geometry_type="POINT", srid=4326, spatial_index=False), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+# 6.2. FireStation Model
+class FireStation(Base):
+    __tablename__ = "fire_stations"
+
+    id = Column(Integer, primary_key=True, index=True)
+    osm_id = Column(Numeric, unique=True, index=True)
+    name = Column(String(250), nullable=False)
+    geom = Column(Geometry(geometry_type="POINT", srid=4326, spatial_index=False), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
 # 7. BusStop Model
 class BusStop(Base):
     __tablename__ = "bus_stops"

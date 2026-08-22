@@ -5,6 +5,8 @@ from pipelines.ingest_roads import parse_lanes, parse_maxspeed, parse_oneway
 from pipelines.ingest_buildings import parse_height, parse_levels
 from pipelines.ingest_hospitals import parse_beds, parse_geometry
 from pipelines.ingest_schools import parse_geometry as parse_school_geometry
+from pipelines.ingest_police import parse_geometry as parse_police_geometry
+
 
 
 def test_validate_and_normalize_valid_polygon():
@@ -192,5 +194,32 @@ def test_parse_school_geometry():
     assert isinstance(pt2, Point)
     assert pt2.x == pytest.approx(85.85)
     assert pt2.y == pytest.approx(20.25)
+
+
+def test_parse_safety_geometry():
+    # Test Node (Point)
+    node = {"type": "node", "id": 20, "lat": 20.32, "lon": 85.88}
+    pt = parse_police_geometry(node)
+    assert isinstance(pt, Point)
+    assert pt.x == 85.88
+    assert pt.y == 20.32
+
+    # Test Way (Centroid)
+    way = {
+        "type": "way",
+        "id": 21,
+        "geometry": [
+            {"lat": 20.2, "lon": 85.8},
+            {"lat": 20.3, "lon": 85.8},
+            {"lat": 20.3, "lon": 85.9},
+            {"lat": 20.2, "lon": 85.9},
+            {"lat": 20.2, "lon": 85.8}
+        ]
+    }
+    pt2 = parse_police_geometry(way)
+    assert isinstance(pt2, Point)
+    assert pt2.x == pytest.approx(85.85)
+    assert pt2.y == pytest.approx(20.25)
+
 
 

@@ -181,3 +181,43 @@ def test_get_school_by_id_not_found():
     response = client.get("/api/v1/schools/9999")
     assert response.status_code == 404
     assert "not found" in response.json()["detail"].lower()
+
+
+def test_get_police_empty():
+    """
+    Verifies that fetching police stations returns an empty GeoJSON FeatureCollection when no records exist.
+    """
+    response = client.get("/api/v1/police")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["type"] == "FeatureCollection"
+    assert len(data["features"]) == 0
+
+
+def test_get_police_by_id_not_found():
+    """
+    Verifies that querying a non-existent police station ID returns 404 Not Found.
+    """
+    response = client.get("/api/v1/police/9999")
+    assert response.status_code == 404
+    assert "not found" in response.json()["detail"].lower()
+
+
+def test_get_fire_stations_empty():
+    """
+    Verifies that fetching fire stations returns an empty GeoJSON FeatureCollection when no records exist.
+    """
+    response = client.get("/api/v1/fire-stations")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["type"] == "FeatureCollection"
+    assert len(data["features"]) == 0
+
+
+def test_get_fire_station_by_id_not_found():
+    """
+    Verifies that querying a non-existent fire station ID returns 404 Not Found.
+    """
+    response = client.get("/api/v1/fire-stations/9999")
+    assert response.status_code == 404
+    assert "not found" in response.json()["detail"].lower()
