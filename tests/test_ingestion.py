@@ -2,6 +2,7 @@ import pytest
 from shapely.geometry import Polygon, MultiPolygon
 from pipelines.ingest_wards import validate_and_normalize_feature
 from pipelines.ingest_roads import parse_lanes, parse_maxspeed, parse_oneway
+from pipelines.ingest_buildings import parse_height, parse_levels
 
 def test_validate_and_normalize_valid_polygon():
     """
@@ -102,3 +103,24 @@ def test_parse_oneway():
     assert parse_oneway("true") is True
     assert parse_oneway("no") is False
     assert parse_oneway("0") is False
+
+def test_parse_height():
+    """
+    Verifies that building heights are parsed correctly.
+    """
+    assert parse_height(None) is None
+    assert parse_height(15.5) == 15.5
+    assert parse_height("12") == 12.0
+    assert parse_height("18.5 m") == 18.5
+    assert parse_height("20 meters") == 20.0
+    assert parse_height("invalid_height") is None
+
+def test_parse_levels():
+    """
+    Verifies that building levels are parsed correctly.
+    """
+    assert parse_levels(None) is None
+    assert parse_levels(3) == 3
+    assert parse_levels("4") == 4
+    assert parse_levels("ground+2") == 2  # Extract first digit sequence found
+    assert parse_levels("invalid_levels") is None
