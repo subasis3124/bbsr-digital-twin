@@ -221,3 +221,23 @@ def test_get_fire_station_by_id_not_found():
     response = client.get("/api/v1/fire-stations/9999")
     assert response.status_code == 404
     assert "not found" in response.json()["detail"].lower()
+
+
+def test_get_bus_stops_empty():
+    """
+    Verifies that fetching bus stops returns an empty GeoJSON FeatureCollection when no records exist.
+    """
+    response = client.get("/api/v1/bus-stops")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["type"] == "FeatureCollection"
+    assert len(data["features"]) == 0
+
+
+def test_get_bus_stop_by_id_not_found():
+    """
+    Verifies that querying a non-existent bus stop ID returns 404 Not Found.
+    """
+    response = client.get("/api/v1/bus-stops/9999")
+    assert response.status_code == 404
+    assert "not found" in response.json()["detail"].lower()
