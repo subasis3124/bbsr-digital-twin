@@ -19,6 +19,12 @@ class MockQuery:
     def filter(self, *args, **kwargs):
         return self
 
+    def offset(self, *args, **kwargs):
+        return self
+
+    def limit(self, *args, **kwargs):
+        return self
+
     def first(self):
         return None
 
@@ -93,5 +99,25 @@ def test_get_ward_by_id_not_found():
     Verifies that querying a non-existent ward ID returns 404 Not Found.
     """
     response = client.get("/api/v1/wards/999")
+    assert response.status_code == 404
+    assert "not found" in response.json()["detail"].lower()
+
+
+def test_get_roads_empty():
+    """
+    Verifies that fetching roads returns an empty GeoJSON FeatureCollection when no records exist.
+    """
+    response = client.get("/api/v1/roads")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["type"] == "FeatureCollection"
+    assert len(data["features"]) == 0
+
+
+def test_get_road_by_id_not_found():
+    """
+    Verifies that querying a non-existent road ID returns 404 Not Found.
+    """
+    response = client.get("/api/v1/roads/9999")
     assert response.status_code == 404
     assert "not found" in response.json()["detail"].lower()
