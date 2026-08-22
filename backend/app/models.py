@@ -71,8 +71,10 @@ class School(Base):
     id = Column(Integer, primary_key=True, index=True)
     osm_id = Column(Numeric, unique=True, index=True)
     name = Column(String(250), nullable=False)
+    institution_type = Column(String(100))
     geom = Column(Geometry(geometry_type="POINT", srid=4326, spatial_index=False), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
 
 # 7. BusStop Model
 class BusStop(Base):
