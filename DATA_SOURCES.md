@@ -94,6 +94,19 @@ To build a technically credible and data-driven digital twin, we list here the e
     - `name` (Bus stop name) -> `bus_stops.name` (stored as `NULL` if missing or empty in OSM)
 *   **Limitations**: Polygon campus outlines (e.g., station building polygons) are normalized to their centroid Point geometries to conform with the POINT database schemas.
 
+### 8. Hydrological Infrastructure / Water Bodies (OSM Vector)
+*   **Source**: OpenStreetMap (OSM) contributors via Overpass API (`https://overpass-api.de/api/interpreter`).
+*   **Extraction Date**: 2026-08-22
+*   **Geographic Scope**: Bhubaneswar bounding box `[20.211, 85.732, 20.367, 85.904]`, spatially filtered by BMC ward boundaries.
+*   **Number of Features**: 65 elements read; 46 elements geographically relevant and ingested into database.
+*   **CRS**: EPSG:4326 (WGS 84 coordinate system).
+*   **License**: Open Database License (ODbL). Requires the attribution: "© OpenStreetMap contributors".
+*   **Attribute Mapping**:
+    - `id` (OSM Way/Relation ID) -> `water_bodies.osm_id`
+    - `name` (Water body name) -> `water_bodies.name` (stored as `NULL` if missing or empty in OSM)
+    - `water` / `waterway` / `landuse` / `natural` (Category type) -> `water_bodies.water_type` (defaults to "water" if absent)
+*   **Limitations**: Relation multi-polygons are resolved to the largest component Polygon by area to satisfy the database POLYGON geometry constraint.
+
 ---
 
 ## ⛰️ Terrain & Environmental Data

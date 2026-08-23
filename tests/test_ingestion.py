@@ -7,6 +7,8 @@ from pipelines.ingest_hospitals import parse_beds, parse_geometry
 from pipelines.ingest_schools import parse_geometry as parse_school_geometry
 from pipelines.ingest_police import parse_geometry as parse_police_geometry
 from pipelines.ingest_bus_stops import parse_geometry as parse_bus_stop_geometry
+from pipelines.ingest_water_bodies import parse_geometry as parse_water_body_geometry
+
 
 
 
@@ -248,6 +250,89 @@ def test_parse_bus_stop_geometry():
     assert isinstance(pt2, Point)
     assert pt2.x == pytest.approx(85.85)
     assert pt2.y == pytest.approx(20.25)
+
+
+def test_parse_water_body_geometry():
+    # Test Way (Polygon)
+    way = {
+        "type": "way",
+        "id": 40,
+        "geometry": [
+            {"lat": 20.2, "lon": 85.8},
+            {"lat": 20.3, "lon": 85.8},
+            {"lat": 20.3, "lon": 85.9},
+            {"lat": 20.2, "lon": 85.9},
+            {"lat": 20.2, "lon": 85.8}
+        ]
+    }
+    poly = parse_water_body_geometry(way)
+    assert isinstance(poly, Polygon)
+    assert poly.exterior.coords[0] == (85.8, 20.2)
+    assert poly.exterior.coords[2] == (85.9, 20.3)
+
+
+def test_parse_water_body_geometry_relation():
+    # Test Relation (Multiple Polygons, largest is resolved)
+    relation = {
+        "type": "relation",
+        "id": 41,
+        "members": [
+            {
+                "type": "way",
+                "ref": 100,
+                "role": "outer",
+                "geometry": [
+                    {"lat": 20.2, "lon": 85.8},
+                    {"lat": 20.3, "lon": 85.8},
+                    {"lat": 20.3, "lon": 85.9},
+                    {"lat": 20.2, "lon": 85.9},
+                    {"lat": 20.2, "lon": 85.8}
+                ]
+            },
+            {
+                "type": "way",
+                "ref": 101,
+                "role": "outer",
+                "geometry": [
+                    {"lat": 20.2, "lon": 85.8},
+                    {"lat": 20.22, "lon": 85.8},
+                    {"lat": 20.22, "lon": 85.82},
+                    {"lat": 20.2, "lon": 85.82},
+                    {"lat": 20.2, "lon": 85.8}
+                ]
+            }
+        ]
+    }
+    poly = parse_water_body_geometry(relation)
+    assert isinstance(poly, Polygon)
+    # The first polygon has area ~0.01 deg^2, the second is ~0.0004 deg^2. Major one should be chosen.
+    assert poly.area > 0.005
+    assert poly.exterior.coords[0] == (85.8, 20.2)
+    assert poly.exterior.coords[2] == (85.9, 20.3)
+
+
+def test_parse_water_body_geometry_invalid():
+    # Invalid coordinates (less than 3)
+    way_few_coords = {
+        "type": "way",
+        "id": 42,
+        "geometry": [
+            {"lat": 20.2, "lon": 85.8},
+            {"lat": 20.3, "lon": 85.8}
+        ]
+    }
+    assert parse_water_body_geometry(way_few_coords) is None
+
+    # Invalid type
+    node = {
+        "type": "node",
+        "id": 43,
+        "lat": 20.2,
+        "lon": 85.8
+    }
+    assert parse_water_body_geometry(node) is None
+
+
 
 
 
