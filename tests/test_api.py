@@ -1,10 +1,10 @@
 import pytest
 from fastapi.testclient import TestClient
-from shapely.geometry import Polygon, MultiPolygon
+from shapely.geometry import Polygon, MultiPolygon, LineString
 from geoalchemy2.shape import from_shape
 from backend.app.main import app
 from backend.app.database import get_db
-from backend.app.models import WaterBody, Ward
+from backend.app.models import WaterBody, Ward, BusRoute
 
 client = TestClient(app)
 
@@ -429,4 +429,189 @@ def test_water_bodies_api_rich_scenarios():
     finally:
         # Restore mock session to empty
         app.dependency_overrides[get_db] = override_get_db
+
+
+def test_get_bus_routes_empty():
+    """
+    Verifies that fetching bus routes returns an empty GeoJSON FeatureCollection when no records exist.
+    """
+    response = client.get("/api/v1/bus-routes")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["type"] == "FeatureCollection"
+    assert len(data["features"]) == 0
+
+
+def test_get_bus_route_by_id_not_found():
+    """
+    Verifies that querying a non-existent bus route ID returns 404 Not Found.
+    """
+    response = client.get("/api/v1/bus-routes/9999")
+    assert response.status_code == 404
+    assert "not found" in response.json()["detail"].lower()
+
+
+def test_bus_routes_api_rich_scenarios():
+    # 1. Create mock data
+    line1 = LineString([(85.8, 20.2), (85.8, 20.3)])
+    line2 = LineString([(85.75, 20.21), (85.75, 20.25)])
+    
+    mock_br1 = BusRoute(
+        id=1,
+        route_name="Mo Bus Route 11",
+        operator="CRUT",
+        geom=from_shape(line1, srid=4326)
+    )
+    mock_br2 = BusRoute(
+        id=2,
+        route_name="Route 12",
+        operator="Private",
+        geom=from_shape(line2, srid=4326)
+    )
+    
+    mock_ward = Ward(
+        id=5,
+        ward_number=5,
+        name="Old Town",
+        geom=from_shape(MultiPolygon([Polygon([(85.0, 20.0), (86.0, 20.0), (86.0, 21.0), (85.0, 21.0), (85.0, 20.0)])]), srid=4326)
+    )
+    
+    # 2. Define custom MockQuery for filtering and pagination simulation
+    class BusRouteMockQuery:
+        def __init__(self, data, model=BusRoute):
+            self.data = data
+            self.model = model
+            self._offset = 0
+            self._limit = None
+
+        def filter(self, *args, **kwargs):
+            filtered = list(self.data)
+            for arg in args:
+                try:
+                    col_name = arg.left.name.lower()
+                    val = arg.right.value
+                    if col_name == 'route_name':
+                        clean_val = str(val).replace('%', '').lower()
+                        filtered = [x for x in filtered if clean_val in (x.route_name or "").lower()]
+                    elif col_name == 'operator':
+                        clean_val = str(val).replace('%', '').lower()
+                        filtered = [x for x in filtered if clean_val in (x.operator or "").lower()]
+                    elif col_name == 'id':
+                        filtered = [x for x in filtered if x.id == val]
+                except Exception:
+                    arg_str = str(arg).lower()
+                    if "intersects" in arg_str or "ward" in arg_str or "geom" in arg_str:
+                        filtered = [x for x in filtered if x.id == 1]
+            return BusRouteMockQuery(filtered, self.model)
+
+        def offset(self, val):
+            self._offset = val
+            return self
+
+        def limit(self, val):
+            self._limit = val
+            return self
+
+        def all(self):
+            res = self.data[self._offset:]
+            if self._limit is not None:
+                res = res[:self._limit]
+            return res
+
+        def first(self):
+            res = self.all()
+            return res[0] if res else None
+
+    class WardMockQuery:
+        def __init__(self, data):
+            self.data = data
+
+        def filter(self, *args, **kwargs):
+            return self
+
+        def first(self):
+            return self.data[0] if self.data else None
+
+    class RichMockSession:
+        def query(self, model):
+            if model == BusRoute:
+                return BusRouteMockQuery([mock_br1, mock_br2], BusRoute)
+            elif model == Ward:
+                return WardMockQuery([mock_ward])
+            return MockQuery(model)
+
+        def close(self):
+            pass
+
+    def rich_get_db():
+        db = RichMockSession()
+        try:
+            yield db
+        finally:
+            db.close()
+
+    # Apply override
+    app.dependency_overrides[get_db] = rich_get_db
+    
+    try:
+        # A. Test collection API returning both items
+        res = client.get("/api/v1/bus-routes")
+        assert res.status_code == 200
+        data = res.json()
+        assert data["type"] == "FeatureCollection"
+        assert len(data["features"]) == 2
+        names = [f["properties"]["route_name"] for f in data["features"]]
+        assert "Mo Bus Route 11" in names
+        assert "Route 12" in names
+
+        # B. Test Pagination: limit=1
+        res = client.get("/api/v1/bus-routes?limit=1")
+        assert res.status_code == 200
+        data = res.json()
+        assert len(data["features"]) == 1
+
+        # C. Test Pagination: offset=1
+        res = client.get("/api/v1/bus-routes?offset=1")
+        assert res.status_code == 200
+        data = res.json()
+        assert len(data["features"]) == 1
+        assert data["features"][0]["properties"]["route_name"] == "Route 12"
+
+        # D. Test Name filter matching "Route 11"
+        res = client.get("/api/v1/bus-routes?route_name=Route+11")
+        assert res.status_code == 200
+        data = res.json()
+        assert len(data["features"]) == 1
+        assert data["features"][0]["properties"]["route_name"] == "Mo Bus Route 11"
+
+        # E. Test Operator filter
+        res = client.get("/api/v1/bus-routes?operator=Private")
+        assert res.status_code == 200
+        data = res.json()
+        assert len(data["features"]) == 1
+        assert data["features"][0]["properties"]["route_name"] == "Route 12"
+
+        # F. Test Ward ID spatial filter
+        res = client.get("/api/v1/bus-routes?ward_id=5")
+        assert res.status_code == 200
+        data = res.json()
+        assert len(data["features"]) == 1
+        assert data["features"][0]["properties"]["route_name"] == "Mo Bus Route 11"
+
+        # G. Test Single Route Endpoint
+        res = client.get("/api/v1/bus-routes/1")
+        assert res.status_code == 200
+        data = res.json()
+        assert data["type"] == "Feature"
+        assert data["properties"]["route_name"] == "Mo Bus Route 11"
+
+        res = client.get("/api/v1/bus-routes/2")
+        assert res.status_code == 200
+        data = res.json()
+        assert data["properties"]["route_name"] == "Route 12"
+
+    finally:
+        # Restore mock session to empty
+        app.dependency_overrides[get_db] = override_get_db
+
 

@@ -107,6 +107,18 @@ To build a technically credible and data-driven digital twin, we list here the e
     - `water` / `waterway` / `landuse` / `natural` (Category type) -> `water_bodies.water_type` (defaults to "water" if absent)
 *   **Limitations**: Relation multi-polygons are resolved to the largest component Polygon by area to satisfy the database POLYGON geometry constraint.
 
+### 9. Bus Routes (OSM Transit Relations)
+*   **Source**: OpenStreetMap (OSM) contributors via Overpass API (`https://overpass-api.de/api/interpreter`).
+*   **Extraction Date**: 2026-08-23
+*   **Geographic Scope**: Bhubaneswar bounding box `[20.211, 85.732, 20.367, 85.904]`, spatially filtered by BMC ward boundaries.
+*   **Number of Features**: 75 elements read; 70 elements geographically relevant and ingested into database.
+*   **CRS**: EPSG:4326 (WGS 84 coordinate system).
+*   **License**: Open Database License (ODbL). Requires the attribution: "© OpenStreetMap contributors".
+*   **Attribute Mapping**:
+    - `name` / `ref` tags -> `bus_routes.route_name` (strictly required, falls back to `Bus Route <osm_id>`)
+    - `operator` tag -> `bus_routes.operator` (defaults to "CRUT")
+*   **Limitations**: Bus routes are represented as relations in OSM, composed of constituent way segments. These segments are merged using Shapely's `linemerge` operation. In instances where routes are disjoint or form MultiLineStrings, the longest continuous LineString is stored to conform to the database table constraint.
+
 ---
 
 ## ⛰️ Terrain & Environmental Data
@@ -174,6 +186,8 @@ To build a technically credible and data-driven digital twin, we list here the e
 | :--- | :--- | :--- | :--- | :--- |
 | **DataMeet GitHub** | Ward Boundaries | Immediately Accessible | GeoJSON | DB Ingestion script in Phase 3 |
 | **OpenStreetMap** | Roads, POIs, Schools | Immediately Accessible | GeoJSON | Overpass API script in Phase 3 |
+| **OpenStreetMap** | Water Bodies | Immediately Accessible | GeoJSON | DB Ingestion script in Phase 4.7 |
+| **OpenStreetMap** | Bus Routes | Immediately Accessible | GeoJSON | DB Ingestion script in Phase 4.8 |
 | **Copernicus GLO-30**| Terrain/Elevation | Immediately Accessible | GeoTIFF | Raster processing in Phase 5 |
 | **Sentinel-2** | Land Cover (NDVI) | Immediately Accessible | GeoTIFF | GEE Export / Rasterio in Phase 5 |
 | **OpenAQ / CPCB** | AQI PM2.5 / PM10 | Immediately Accessible | JSON API | Scheduled pipeline in Phase 5 |

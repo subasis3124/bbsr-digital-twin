@@ -1,5 +1,5 @@
 import pytest
-from shapely.geometry import Point, Polygon, MultiPolygon
+from shapely.geometry import Point, Polygon, MultiPolygon, LineString
 from pipelines.ingest_wards import validate_and_normalize_feature
 from pipelines.ingest_roads import parse_lanes, parse_maxspeed, parse_oneway
 from pipelines.ingest_buildings import parse_height, parse_levels
@@ -8,6 +8,7 @@ from pipelines.ingest_schools import parse_geometry as parse_school_geometry
 from pipelines.ingest_police import parse_geometry as parse_police_geometry
 from pipelines.ingest_bus_stops import parse_geometry as parse_bus_stop_geometry
 from pipelines.ingest_water_bodies import parse_geometry as parse_water_body_geometry
+from pipelines.ingest_bus_routes import parse_geometry as parse_bus_route_geometry
 
 
 
@@ -333,7 +334,57 @@ def test_parse_water_body_geometry_invalid():
     assert parse_water_body_geometry(node) is None
 
 
+def test_parse_bus_route_geometry():
+    # Test valid relation with member ways
+    relation = {
+        "type": "relation",
+        "id": 50,
+        "members": [
+            {
+                "type": "way",
+                "ref": 300,
+                "geometry": [
+                    {"lat": 20.2, "lon": 85.8},
+                    {"lat": 20.3, "lon": 85.8}
+                ]
+            },
+            {
+                "type": "way",
+                "ref": 301,
+                "geometry": [
+                    {"lat": 20.3, "lon": 85.8},
+                    {"lat": 20.3, "lon": 85.9}
+                ]
+            }
+        ]
+    }
+    line = parse_bus_route_geometry(relation)
+    assert isinstance(line, LineString)
+    assert list(line.coords) == [(85.8, 20.2), (85.8, 20.3), (85.9, 20.3)]
 
 
+def test_parse_bus_route_geometry_invalid():
+    # Invalid coordinates (less than 2)
+    relation_bad = {
+        "type": "relation",
+        "id": 51,
+        "members": [
+            {
+                "type": "way",
+                "ref": 303,
+                "geometry": [
+                    {"lat": 20.2, "lon": 85.8}
+                ]
+            }
+        ]
+    }
+    assert parse_bus_route_geometry(relation_bad) is None
 
-
+    # Invalid type
+    node = {
+        "type": "node",
+        "id": 52,
+        "lat": 20.2,
+        "lon": 85.8
+    }
+    assert parse_bus_route_geometry(node) is None
