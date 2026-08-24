@@ -194,3 +194,17 @@ To build a technically credible and data-driven digital twin, we list here the e
 | **Open-Meteo** | Temperature/Rainfall | Immediately Accessible | JSON API | Scheduled pipeline in Phase 5 |
 | **WorldPop** | Population Density | Immediately Accessible | GeoTIFF | Spatial zonal stats in Phase 5 |
 | **Traffic Sensors** | Congestion/Speed | Uncertain / Synthetic | JSON API | Custom Simulation Engine in Phase 8 |
+| **Historical Floods**| Flood Events shapes| Immediately Accessible | GeoJSON | Target Ingestion script in Phase 6 |
+| **ML Model Runs**    | Risk Predictions | Model Generated       | Tabular/GeoJSON| Spatial ML Predictors in Phase 7 |
+
+---
+
+## 🌊 Flood Inundation & Susceptibility Data
+
+### 10. Historical Flood Observations (GeoJSON Targets)
+*   **Accessibility**: Immediately Accessible (Synthetic Fallback / Dry Run)
+*   **Source**: Public observation datasets or municipal disaster management portal records.
+*   **Format**: GeoJSON (EPSG:4326)
+*   **Ingestion Path**: Loaded via the `flood_target` pipeline source into the `flood_events` table.
+*   **Scientific Warning**: Since a defensible historical flood target dataset is currently unavailable for Bhubaneswar, the models default to a synthetic training set for pipeline verification. All outputs are explicitly marked with `is_synthetic = True` under the `"synthetic_fallback"` status to prevent user misinterpretation of risk.
+
