@@ -253,3 +253,25 @@ class Simulation(Base):
     delta_risk = Column(Numeric, nullable=False)
 
     grid_cell = relationship("SpatialGridCell", back_populates="simulations")
+
+
+# 19. ETLJobRun Model
+class ETLJobRun(Base):
+    __tablename__ = "etl_job_runs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    source = Column(String(50), nullable=False, index=True)      # e.g., "weather", "air_quality", "population", "dem", "sentinel2"
+    dataset = Column(String(100), nullable=False)                 # e.g., "open-meteo", "openaq", "worldpop-2020", "copernicus-glo30", "sentinel2-ndvi"
+    job_uuid = Column(String(36), nullable=False, unique=True, index=True)
+    execution_time = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    period_start = Column(DateTime(timezone=True))
+    period_end = Column(DateTime(timezone=True))
+    status = Column(String(20), nullable=False)                  # e.g., "success", "failed", "partial"
+    records_processed = Column(Integer, default=0)
+    records_inserted = Column(Integer, default=0)
+    records_updated = Column(Integer, default=0)
+    records_skipped = Column(Integer, default=0)
+    records_rejected = Column(Integer, default=0)
+    error_message = Column(String(1000))
+    duration = Column(Numeric)                                     # Duration in seconds
+

@@ -1,0 +1,5 @@
+from pipelines.sources.copernicus_dem import CopernicusDEMPipeline
+from pipelines.sources.worldpop import WorldPopPipeline
+from pipelines.sources.sentinel2 import Sentinel2Pipeline
+from pipelines.sources.open_meteo import OpenMeteoPipeline
+from pipelines.sources.air_quality import AirQualityPipeline
