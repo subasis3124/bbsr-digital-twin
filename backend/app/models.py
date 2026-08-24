@@ -40,6 +40,7 @@ class Road(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     traffic_observations = relationship("Traffic", back_populates="road", cascade="all, delete-orphan")
+    traffic_predictions = relationship("TrafficPrediction", back_populates="road", cascade="all, delete-orphan")
 
 # 4. Building Model
 class Building(Base):
@@ -274,4 +275,24 @@ class ETLJobRun(Base):
     records_rejected = Column(Integer, default=0)
     error_message = Column(String(1000))
     duration = Column(Numeric)                                     # Duration in seconds
+
+
+# 20. TrafficPrediction Model
+class TrafficPrediction(Base):
+    __tablename__ = "traffic_predictions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    road_id = Column(Integer, ForeignKey("roads.id", ondelete="CASCADE"), nullable=False, index=True)
+    prediction_time = Column(DateTime(timezone=True), nullable=False, index=True)
+    forecast_horizon_minutes = Column(Integer, nullable=False)
+    predicted_speed = Column(Numeric, nullable=False)
+    predicted_congestion_ratio = Column(Numeric)
+    model_name = Column(String(100), nullable=False)
+    model_version = Column(String(50), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    is_synthetic = Column(Boolean, default=True, nullable=False)
+    data_provenance_status = Column(String(50), nullable=False)
+
+    road = relationship("Road", back_populates="traffic_predictions")
+
 

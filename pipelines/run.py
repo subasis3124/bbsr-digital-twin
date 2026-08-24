@@ -6,6 +6,7 @@ from pipelines.sources.sentinel2 import Sentinel2Pipeline
 from pipelines.sources.open_meteo import OpenMeteoPipeline
 from pipelines.sources.air_quality import AirQualityPipeline
 from pipelines.sources.flood_target import FloodTargetPipeline
+from pipelines.sources.traffic import TrafficObservationsPipeline
 from pipelines.etl.logging import get_etl_logger
 from pipelines.etl.initialize_grid import initialize_spatial_grid
 
@@ -17,7 +18,8 @@ PIPELINES_MAP = {
     "sentinel2": Sentinel2Pipeline,
     "weather": OpenMeteoPipeline,
     "air_quality": AirQualityPipeline,
-    "flood_target": FloodTargetPipeline
+    "flood_target": FloodTargetPipeline,
+    "traffic": TrafficObservationsPipeline
 }
 
 def main():

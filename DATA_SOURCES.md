@@ -171,12 +171,11 @@ To build a technically credible and data-driven digital twin, we list here the e
 *   **License**: Creative Commons Attribution 4.0 International (WorldPop).
 
 ### 8. Traffic Telemetry
-*   **Accessibility**: Uncertain / Requires API
-*   **Source**: Real-time traffic telemetry is proprietary. We will:
-    1. Query OSM `maxspeed` and road capacity tags.
-    2. Interface with TomTom/Here Traffic API if API keys are available.
-    3. Generate a structured traffic profile (using typical rush-hour functions mapped to the road network graph nodes) to serve as a **synthetic traffic simulator**, clearly marked as synthetic.
-*   **License**: Proprietary / OpenStreetMap data derivatives.
+*   **Accessibility**: Immediately Accessible (via ETL Simulator Seeder)
+*   **Source**: OpenStreetMap centerlines (maxspeed / names) joined with our hourly Traffic Simulator seeder (`pipelines/sources/traffic.py`) producing synthetic congestion flows.
+*   **Format**: Relational DB Rows (PostgreSQL `traffic` observations table).
+*   **Telemetry status**: Labeled as `synthetic_simulator` provenance.
+*   **License**: Open Database License (ODbL) for road centerlines; public domain for simulated observations.
 
 ---
 
@@ -193,9 +192,10 @@ To build a technically credible and data-driven digital twin, we list here the e
 | **OpenAQ / CPCB** | AQI PM2.5 / PM10 | Immediately Accessible | JSON API | Scheduled pipeline in Phase 5 |
 | **Open-Meteo** | Temperature/Rainfall | Immediately Accessible | JSON API | Scheduled pipeline in Phase 5 |
 | **WorldPop** | Population Density | Immediately Accessible | GeoTIFF | Spatial zonal stats in Phase 5 |
-| **Traffic Sensors** | Congestion/Speed | Uncertain / Synthetic | JSON API | Custom Simulation Engine in Phase 8 |
+| **Traffic Seeder** | Congestion/Speed | Immediately Accessible | DB Rows | Seeding pipeline in Phase 8 |
 | **Historical Floods**| Flood Events shapes| Immediately Accessible | GeoJSON | Target Ingestion script in Phase 6 |
-| **ML Model Runs**    | Risk Predictions | Model Generated       | Tabular/GeoJSON| Spatial ML Predictors in Phase 7 |
+| **Flood ML Runs**    | Risk Predictions | Model Generated       | Tabular/GeoJSON| Spatial ML Predictors in Phase 7 |
+| **Traffic ML Runs**  | Forecast Predictions  | Model Generated       | Tabular/GeoJSON| ML Routing Forecast in Phase 8 |
 
 ---
 
@@ -207,4 +207,16 @@ To build a technically credible and data-driven digital twin, we list here the e
 *   **Format**: GeoJSON (EPSG:4326)
 *   **Ingestion Path**: Loaded via the `flood_target` pipeline source into the `flood_events` table.
 *   **Scientific Warning**: Since a defensible historical flood target dataset is currently unavailable for Bhubaneswar, the models default to a synthetic training set for pipeline verification. All outputs are explicitly marked with `is_synthetic = True` under the `"synthetic_fallback"` status to prevent user misinterpretation of risk.
+
+---
+
+## 🚗 Traffic Forecasting & Predictions Data
+
+### 11. Traffic Segment Predictions (FastAPI Endpoints)
+*   **Accessibility**: Model Generated / Inferred
+*   **Data Provenance**: Marked as `synthetic_fallback` when using simulator observations; switches to `validated_model` on real road telemetry.
+*   **Feature Engineering**: Uses lag observed speed (1h, 2h, 24h) and 3h rolling averages shifted chronologically to prevent temporal leakage.
+*   **Temporal Splitting**: Trains on a strict chronological split (Train=70%, Validation=15%, Test=15%) preserving temporal order (max(train) < min(val) < min(test)).
+*   **Endpoints**: Emits predictions at `/api/v1/traffic` (with spatial intersects viewport filter) and `/api/v1/traffic/{road_id}` as GeoJSON features with dynamic `scientific_validation_warning` attributes.
+
 
