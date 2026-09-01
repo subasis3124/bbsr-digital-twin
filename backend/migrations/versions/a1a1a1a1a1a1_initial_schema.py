@@ -17,8 +17,11 @@ depends_on = None
 
 
 def upgrade() -> None:
-    # 1. Enable PostGIS Extension
-    op.execute("CREATE EXTENSION IF NOT EXISTS postgis")
+    # 1. Enable PostGIS Extension (if permitted)
+    try:
+        op.execute("CREATE EXTENSION IF NOT EXISTS postgis")
+    except Exception as e:
+        print(f"Skipping CREATE EXTENSION postgis: {e}")
 
     # 2. City Table
     op.create_table(

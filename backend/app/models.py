@@ -296,3 +296,24 @@ class TrafficPrediction(Base):
     road = relationship("Road", back_populates="traffic_predictions")
 
 
+# 21. AirQualityPrediction Model
+class AirQualityPrediction(Base):
+    __tablename__ = "air_quality_predictions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    station_name = Column(String(100), nullable=False, index=True)
+    pollutant = Column(String(20), nullable=False, index=True)
+    forecast_issue_time = Column(DateTime(timezone=True), nullable=False, index=True)
+    target_time = Column(DateTime(timezone=True), nullable=False, index=True)
+    horizon_hours = Column(Integer, nullable=False, index=True)
+    predicted_value = Column(Numeric, nullable=False)
+    aqi_sub_index = Column(Integer)
+    model_name = Column(String(100), nullable=False)
+    model_version = Column(String(50), nullable=False)
+    geom = Column(Geometry(geometry_type="POINT", srid=4326, spatial_index=False), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    is_synthetic = Column(Boolean, default=True, nullable=False)
+    data_provenance_status = Column(String(50), nullable=False)
+
+
+

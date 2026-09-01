@@ -73,6 +73,7 @@ Refer to [docs/database_proposal.md](database_proposal.md) for full SQL definiti
 | **Water Bodies** | `water_bodies`| Polygon | Water type (river, pond, lake) |
 | **Weather** | `weather` | None (Relational)| Precipitation (rainfall), temp, timestamp |
 | **Air Quality** | `air_quality` | Point | PM2.5, PM10, AQI index, station location |
+| **Air Quality Predictions** | `air_quality_predictions` | Point | Multi-horizon pollutant forecasts, forecast issue time, target time, synthetic flags |
 | **Grid Cells** | `spatial_grid_cells`| Polygon | Cell code, centroid point. Has relationships to `predictions` & `simulations` |
 | **ML Predictions**| `predictions` | None (Relational)| FK to cell. Predicted risk class, probability, SHAP map |
 | **Simulations** | `simulations` | None (Relational)| FK to cell. Simulation UUID, scenario, delta risk |

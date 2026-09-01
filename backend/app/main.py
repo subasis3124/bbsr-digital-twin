@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.app.routes import (
     health, cities, wards, roads, buildings, hospitals, schools,
     police, fire_stations, bus_stops, water_bodies, bus_routes, flood_risk,
-    traffic
+    traffic, air_quality
 )
 
 app = FastAPI(
@@ -37,6 +37,7 @@ app.include_router(water_bodies.router)
 app.include_router(bus_routes.router)
 app.include_router(flood_risk.router)
 app.include_router(traffic.router)
+app.include_router(air_quality.router)
 
 
 

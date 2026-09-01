@@ -11,10 +11,16 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str = "postgres_secure_pwd"
     POSTGRES_HOST: str = "localhost"
     POSTGRES_PORT: int = 5432
+    DATABASE_URL: str | None = None
 
     # Database URL built dynamically
     @property
     def database_url(self) -> str:
+        if self.DATABASE_URL:
+            return self.DATABASE_URL
+        env_url = os.getenv("DATABASE_URL")
+        if env_url:
+            return env_url
         return f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
 
     # Load configuration from environment variables or .env file

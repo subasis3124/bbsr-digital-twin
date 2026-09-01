@@ -4,12 +4,13 @@ from sqlalchemy.orm import Session
 from typing import Generator
 from backend.app.config import settings
 
-# Engine represents the core interface to the database, handling connections and pooling.
+engine_kwargs = {"pool_pre_ping": True}
+if "sqlite" not in settings.database_url:
+    engine_kwargs.update({"pool_size": 5, "max_overflow": 10})
+
 engine = create_engine(
     settings.database_url,
-    pool_pre_ping=True,      # Checks if connection is alive before querying
-    pool_size=5,             # Number of persistent database connections
-    max_overflow=10          # Extra connections allowed during peak loads
+    **engine_kwargs
 )
 
 # SessionLocal is a factory class for generating database sessions (temporary transactions)

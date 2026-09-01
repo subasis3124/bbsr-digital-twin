@@ -49,8 +49,11 @@ def override_get_db():
     finally:
         db.close()
 
-# Override FastAPI get_db dependency injection with MockSession
-app.dependency_overrides[get_db] = override_get_db
+@pytest.fixture(autouse=True)
+def setup_mock_db_override():
+    app.dependency_overrides[get_db] = override_get_db
+    yield
+    app.dependency_overrides.pop(get_db, None)
 
 
 def test_read_root():
