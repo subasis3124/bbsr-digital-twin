@@ -21,7 +21,7 @@ services:
 
   backend:
     build:
-      context: ..
+      context: .
       dockerfile: backend/Dockerfile
     container_name: bbsr_digital_twin_backend
     restart: always
@@ -47,7 +47,7 @@ services:
 
   frontend:
     build:
-      context: ..
+      context: .
       dockerfile: frontend/Dockerfile
     container_name: bbsr_digital_twin_frontend
     restart: always

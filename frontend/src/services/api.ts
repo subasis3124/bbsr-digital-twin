@@ -12,7 +12,9 @@ import {
   SimulationRunDetail,
   OptimizationCreatePayload,
   OptimizationRunDetail,
-  EmergencyResource
+  EmergencyResource,
+  AIQueryRequest,
+  AIResponse
 } from '../types';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api/v1';
@@ -188,5 +190,21 @@ export const ApiService = {
 
   async getAvailableEmergencyResources(): Promise<{ total_resources: number; resources: EmergencyResource[] }> {
     return fetchJson(`${API_BASE}/optimization/resources`);
+  },
+
+  // 9. Natural Language AI Interface API
+  async sendAIQuery(req: AIQueryRequest): Promise<AIResponse> {
+    return fetchJson<AIResponse>(`${API_BASE}/ai/query`, {
+      method: 'POST',
+      body: JSON.stringify(req),
+    });
+  },
+
+  async fetchAITools(): Promise<{ total_tools: number; tools: any[] }> {
+    return fetchJson(`${API_BASE}/ai/tools`);
+  },
+
+  async fetchAIIntents(): Promise<{ intents: string[] }> {
+    return fetchJson(`${API_BASE}/ai/intents`);
   }
 };

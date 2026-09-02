@@ -4,8 +4,10 @@ from backend.app.routes import (
     health, cities, wards, roads, buildings, hospitals, schools,
     police, fire_stations, bus_stops, water_bodies, bus_routes, flood_risk,
     traffic, air_quality, gnn_traffic, city_state, simulations, optimization,
-    dashboard
+    dashboard, ai
 )
+
+from backend.app.config import settings
 
 app = FastAPI(
     title="BBSR Digital Twin API",
@@ -14,10 +16,10 @@ app = FastAPI(
 )
 
 # Configure Cross-Origin Resource Sharing (CORS)
-# Allows our Next.js frontend to securely query the API from different ports
+allowed_origins_list = [o.strip() for o in settings.ALLOWED_ORIGINS.split(",") if o.strip()] if settings.ALLOWED_ORIGINS else ["*"]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Adjust for production security
+    allow_origins=allowed_origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -44,6 +46,7 @@ app.include_router(city_state.router)
 app.include_router(simulations.router)
 app.include_router(optimization.router)
 app.include_router(dashboard.router)
+app.include_router(ai.router)
 
 
 

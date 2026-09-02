@@ -20,6 +20,8 @@ import { TimeController } from './components/TimeControls/TimeController';
 import { SpatialInspector } from './components/SpatialInspector/SpatialInspector';
 import { CommandMap } from './components/Map/CommandMap';
 import { City3DView } from './components/Map/City3DView';
+import { NaturalLanguagePanel } from './components/NaturalLanguagePanel';
+import { AIMapAction } from './types';
 
 type SidebarTab = 'overview' | 'layers' | 'simulation' | 'optimization';
 
@@ -71,12 +73,24 @@ export const App: React.FC = () => {
   const [activeSimulation, setActiveSimulation] = useState<SimulationRunDetail | null>(null);
   const [activeOptimization, setActiveOptimization] = useState<OptimizationRunDetail | null>(null);
 
+  // AI Assistant Panel State
+  const [isAIPanelOpen, setIsAIPanelOpen] = useState<boolean>(true);
+
   // Inspector Selection
   const [selectedEntity, setSelectedEntity] = useState<{
     type: 'ward' | 'road' | 'resource' | 'flood_cell' | 'air_quality' | 'building';
     id: string | number;
     data: Record<string, any>;
   } | null>(null);
+
+  const handleDispatchMapAction = (action: AIMapAction) => {
+    if (action.action === 'set_layer_visibility' && action.layer) {
+      setLayers((prev) => ({
+        ...prev,
+        [action.layer as keyof ActiveLayers]: action.visible ?? true,
+      }));
+    }
+  };
 
   // Fetch Summary
   const loadSummary = async () => {
@@ -216,14 +230,27 @@ export const App: React.FC = () => {
 
         {/* Center Primary Map Area */}
         <div className="map-view-container">
-          {/* Floating Time Controls Header */}
-          <div className="map-floating-left">
+          {/* Floating Time Controls & AI Assistant Button Header */}
+          <div className="map-floating-left flex gap-2 items-center">
             <TimeController
               selectedHorizon={forecastHorizon}
               onHorizonChange={setForecastHorizon}
               stateMode={stateMode}
               onStateModeChange={setStateMode}
             />
+            <button
+              onClick={() => setIsAIPanelOpen((prev) => !prev)}
+              className={`px-3 py-1.5 rounded-lg border text-xs font-semibold shadow-lg transition-all flex items-center gap-1.5 ${
+                isAIPanelOpen
+                  ? 'bg-cyan-600 border-cyan-400 text-white shadow-cyan-900/50'
+                  : 'bg-slate-900/90 hover:bg-slate-800 border-slate-700 text-cyan-400'
+              }`}
+              title="Toggle Natural Language AI Assistant"
+              id="toggle-ai-panel-btn"
+            >
+              <span>🤖</span>
+              <span>AI Assistant</span>
+            </button>
           </div>
 
           {viewMode === '2D' ? (
@@ -264,6 +291,15 @@ export const App: React.FC = () => {
               onSwitchTo2D={() => setViewMode('2D')}
             />
           )}
+
+          {/* Natural Language AI Assistant Overlay Panel */}
+          <NaturalLanguagePanel
+            isOpen={isAIPanelOpen}
+            onClose={() => setIsAIPanelOpen(false)}
+            onDispatchMapAction={handleDispatchMapAction}
+            activeSpatialContext={selectedEntity ? `${selectedEntity.type}:${selectedEntity.id}` : undefined}
+            activeSimulationId={activeSimulation?.simulation_id}
+          />
         </div>
 
         {/* Right Sidebar Drawer */}

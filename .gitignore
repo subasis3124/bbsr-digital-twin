@@ -61,6 +61,12 @@ coverage.xml
 
 # Django stuff:
 *.log
+pytest_*.txt
+pytest_*.log
+tsc_*.log
+vitest_*.log
+vitest_*.txt
+build_out.txt
 local_settings.py
 db.sqlite3
 db.sqlite3-journal

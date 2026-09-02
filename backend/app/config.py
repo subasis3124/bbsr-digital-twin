@@ -5,6 +5,7 @@ from pydantic import Field
 class Settings(BaseSettings):
     ENV: str = "development"
     DEBUG: bool = True
+    ALLOWED_ORIGINS: str = "*"
     
     POSTGRES_DB: str = "bbsr_digital_twin"
     POSTGRES_USER: str = "postgres"
