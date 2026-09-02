@@ -74,21 +74,21 @@ graph TD
 *   **Goal**: Formulate a time-versioned `CityState` object representing all indicators at time $t$.
 *   **Success Criteria**: Immutable database snapshots allowing retrieval of historic and current states.
 
-### Phase 12: Simulation Engine
+### Phase 12: Simulation Engine (COMPLETE)
 *   **Goal**: Run "what-if" scenarios (e.g., "increase rainfall by 50%", "close road segment X").
-*   **Success Criteria**: Trigger ML inferences dynamically and output delta differences (e.g., changes in hospital access).
+*   **Success Criteria**: Trigger ML inferences dynamically, support heavy rainfall, road closure, air pollution, emergency demand scenarios, maintain base-state immutability, enforce strict typing, log provenance warnings, expose FastAPI endpoints, and output inspectable delta differences (e.g., changes in hospital access and speed). All 105 tests passing.
 
-### Phase 13: Resource Optimization
-*   **Goal**: Solve shelter, ambulance, or supply distribution constraints using Google OR-Tools.
-*   **Success Criteria**: Allocates resources to minimize response time based on predicted risk.
+### Phase 13: Emergency Resource Optimization (COMPLETE)
+*   **Goal**: Solve facility capacity, dispatch, and supply distribution constraints using Google OR-Tools min-cost flow optimization.
+*   **Success Criteria**: Implemented `OptimizationRun` model & Alembic migration; built `ml/optimization` module with OR-Tools CBC solver, Nearest Resource baseline benchmark, spatial travel cost matrix, demand surge generators, decision explainability, FastAPI endpoints `/api/v1/optimization/emergency`, CLI runner `pipelines.optimize_emergency`, and comprehensive test suite (123 total tests passing).
 
-### Phase 14: Command-Center Dashboard
-*   **Goal**: Build a polished, premium Next.js dashboard showing traffic, flooding, and simulation tabs.
-*   **Success Criteria**: Professional visual styling, micro-animations, no placeholders.
+### Phase 14: Command-Center Dashboard (COMPLETE)
+*   **Goal**: Build a polished, premium React + TypeScript command center dashboard providing map-centric visualizations, live city KPIs, what-if scenario simulations, and emergency resource optimization overlays.
+*   **Success Criteria**: Integrated Vite + React + Leaflet frontend; built `/api/v1/dashboard/summary` FastAPI aggregation endpoint; implemented interactive map layers with bounding box support (Flood Risk, GNN Traffic, Air Quality, Wards, Emergency Resources, Allocation Overlays); added Spatial Inspector drawer; supported scenario simulation & OR-Tools emergency optimization triggers with baseline benchmarking; rendered scientific integrity provenance warnings & synthetic data disclosures; verified full test suite (124 backend tests + 9 frontend vitest tests passing).
 
-### Phase 15: 3D GIS Integration
-*   **Goal**: Render 3D terrain, building blocks, and flood risk grids using CesiumJS.
-*   **Success Criteria**: Dynamic toggle between 2D and 3D views using the same unified backend API.
+### Phase 15: 3D GIS Integration (COMPLETE)
+*   **Goal**: Render 3D terrain, extruded building footprints, 3D flood risk grids, elevated GNN traffic segments, AQI columns, and emergency allocation arcs using CesiumJS and Resium.
+*   **Success Criteria**: Seamless 2D/3D view switching in top header navigation; 3D polygon building extrusion using observed height/level data with 12m exemplary defaults; 3D probability height extrusion for flood risk cells; 3D arc vectors for optimization allocations; spatial picking inspector for 3D entities; WebGL error detection with graceful fallback to 2D view; automated test suite (10 frontend Vitest tests + 124 backend tests passing) and documentation (`docs/3d_gis_integration.md`).
 
 ### Phase 16: Natural Language AI Interface
 *   **Goal**: Add an LLM assistant using tool-calling to run simulations, compare traffic, and fetch risks.

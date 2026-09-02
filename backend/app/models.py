@@ -41,6 +41,7 @@ class Road(Base):
 
     traffic_observations = relationship("Traffic", back_populates="road", cascade="all, delete-orphan")
     traffic_predictions = relationship("TrafficPrediction", back_populates="road", cascade="all, delete-orphan")
+    gnn_traffic_predictions = relationship("GNNTrafficPrediction", back_populates="road", cascade="all, delete-orphan")
 
 # 4. Building Model
 class Building(Base):
@@ -314,6 +315,131 @@ class AirQualityPrediction(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     is_synthetic = Column(Boolean, default=True, nullable=False)
     data_provenance_status = Column(String(50), nullable=False)
+
+
+# 22. GNNTrafficPrediction Model
+class GNNTrafficPrediction(Base):
+    __tablename__ = "gnn_traffic_predictions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    road_id = Column(Integer, ForeignKey("roads.id", ondelete="CASCADE"), nullable=False, index=True)
+    prediction_time = Column(DateTime(timezone=True), nullable=False, index=True)
+    forecast_horizon_minutes = Column(Integer, nullable=False)
+    predicted_speed = Column(Numeric, nullable=False)
+    predicted_congestion_ratio = Column(Numeric)
+    gnn_architecture = Column(String(50), nullable=False, default="GraphSAGE")
+    model_name = Column(String(100), nullable=False)
+    model_version = Column(String(50), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    is_synthetic = Column(Boolean, default=True, nullable=False)
+    data_provenance_status = Column(String(50), nullable=False)
+
+    road = relationship("Road", back_populates="gnn_traffic_predictions")
+
+
+# 23. CityStateSnapshot Model
+class CityStateSnapshot(Base):
+    __tablename__ = "city_state_snapshots"
+
+    id = Column(Integer, primary_key=True, index=True)
+    spatial_unit_type = Column(String(50), nullable=False, index=True, default="grid_cell")
+    spatial_id = Column(String(100), nullable=False, index=True)
+    cell_id = Column(Integer, ForeignKey("spatial_grid_cells.id", ondelete="CASCADE"), nullable=True, index=True)
+    ward_id = Column(Integer, ForeignKey("wards.id", ondelete="SET NULL"), nullable=True, index=True)
+    road_id = Column(Integer, ForeignKey("roads.id", ondelete="SET NULL"), nullable=True, index=True)
+
+    state_timestamp = Column(DateTime(timezone=True), nullable=False, index=True)
+    target_timestamp = Column(DateTime(timezone=True), nullable=False, index=True)
+    forecast_horizon_minutes = Column(Integer, default=0, nullable=False, index=True)
+    state_type = Column(String(20), nullable=False, default="CURRENT", index=True)  # CURRENT or FORECAST
+
+    # High-value normalized query fields
+    flood_risk_probability = Column(Numeric, nullable=True)
+    flood_risk_level = Column(String(20), nullable=True)
+    traffic_congestion_index = Column(Numeric, nullable=True)
+    aqi_value = Column(Integer, nullable=True)
+    air_quality_category = Column(String(50), nullable=True)
+    population_count = Column(Integer, nullable=True)
+    population_density = Column(Numeric, nullable=True)
+    emergency_service_density = Column(Numeric, nullable=True)
+
+    # Metadata & Provenance
+    is_synthetic = Column(Boolean, default=False, nullable=False)
+    data_provenance_status = Column(String(50), nullable=False, default="observed")
+    state_schema_version = Column(String(20), nullable=False, default="1.0.0")
+
+    # Geometry for PostGIS spatial queries
+    geom = Column(Geometry(geometry_type="GEOMETRY", srid=4326, spatial_index=False), nullable=True)
+
+    # Complete canonical state payload JSON
+    payload = Column(JSON, nullable=False)
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+# 24. SimulationRun Model
+class SimulationRun(Base):
+    __tablename__ = "simulation_runs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    simulation_id = Column(String(36), unique=True, nullable=False, index=True)
+    scenario_type = Column(String(50), nullable=False, index=True)
+    scenario_name = Column(String(150), nullable=False)
+    base_state_timestamp = Column(DateTime(timezone=True), nullable=False, index=True)
+    simulation_timestamp = Column(DateTime(timezone=True), nullable=False, index=True)
+    spatial_scope_type = Column(String(50), nullable=False, default="all")
+    engine_version = Column(String(20), nullable=False, default="1.0.0")
+    is_synthetic = Column(Boolean, default=True, nullable=False)
+
+    parameters = Column(JSON, nullable=False)
+    impact_summary = Column(JSON, nullable=False)
+    provenance = Column(JSON, nullable=False)
+    transformations = Column(JSON, nullable=False)
+
+    base_state_count = Column(Integer, default=1, nullable=False)
+    simulated_state_count = Column(Integer, default=1, nullable=False)
+    simulated_states_payload = Column(JSON, nullable=False)
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+# 25. OptimizationRun Model
+class OptimizationRun(Base):
+    __tablename__ = "optimization_runs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    run_id = Column(String(36), unique=True, nullable=False, index=True)
+    scenario_id = Column(String(36), nullable=True, index=True)
+    simulation_id = Column(String(36), nullable=True, index=True)
+    base_state_timestamp = Column(DateTime(timezone=True), nullable=True, index=True)
+    optimization_timestamp = Column(DateTime(timezone=True), server_default=func.now(), nullable=False, index=True)
+
+    optimization_method = Column(String(50), nullable=False, default="ortools_min_cost_flow")
+    objective_function = Column(String(100), nullable=False, default="minimize_weighted_travel_cost")
+    engine_version = Column(String(20), nullable=False, default="1.0.0")
+    is_synthetic = Column(Boolean, default=True, nullable=False)
+
+    constraints = Column(JSON, nullable=False)
+    resource_types = Column(JSON, nullable=False)
+    
+    total_demand = Column(Integer, default=0, nullable=False)
+    served_demand = Column(Integer, default=0, nullable=False)
+    unserved_demand = Column(Integer, default=0, nullable=False)
+    total_travel_cost = Column(Numeric, default=0.0, nullable=False)
+    average_travel_cost = Column(Numeric, default=0.0, nullable=False)
+
+    demand_summary = Column(JSON, nullable=False)
+    resource_summary = Column(JSON, nullable=False)
+    allocation_results = Column(JSON, nullable=False)
+    baseline_results = Column(JSON, nullable=False)
+    impact_comparison = Column(JSON, nullable=True)
+    provenance = Column(JSON, nullable=False)
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+
+
 
 
 

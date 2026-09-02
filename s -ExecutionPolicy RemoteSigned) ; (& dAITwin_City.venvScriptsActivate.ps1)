@@ -1,0 +1,50 @@
+Commit: 1ef02e3
+Author: Antigravity AI <antigravity@google.com>
+Committer: Antigravity AI <antigravity@google.com>
+Subject: feat(ml): complete Phase 9 Air Quality Forecasting pipeline, database schema, REST API, and test suite
+
+Commit: cd1370e
+Author: Antigravity AI <antigravity@google.com>
+Committer: Antigravity AI <antigravity@google.com>
+Subject: feat(phase-8): complete traffic forecasting ML models and API endpoints integration
+
+Commit: 23fac2b
+Author: Antigravity AI <antigravity@google.com>
+Committer: Antigravity AI <antigravity@google.com>
+Subject: feat(phase-7): add flood risk map integration
+
+Commit: b31df42
+Author: Antigravity AI <antigravity@google.com>
+Committer: Antigravity AI <antigravity@google.com>
+Subject: Phase 6: Implement Flood Susceptibility Modeling Pipeline with PostGIS KNN distance query optimizations, Spatial Block CV, MLflow tracking, and SHAP explainability
+
+Commit: 4efde3e
+Author: Antigravity AI <antigravity@google.com>
+Committer: Antigravity AI <antigravity@google.com>
+Subject: feat: implement reusable ETL pipelines framework and source integrations
+
+Commit: e8a9c2b
+Author: Antigravity AI <antigravity@google.com>
+Committer: Antigravity AI <antigravity@google.com>
+Subject: feat(phase-4.8): add bus routes ingestion and api endpoints
+
+Commit: 3c8d79b
+Author: Antigravity AI <antigravity@google.com>
+Committer: Antigravity AI <antigravity@google.com>
+Subject: feat(phase-4.7): add water bodies ingestion
+
+Commit: b755424
+Author: subasis3124 <subasismishra3124@gmail.com>
+Committer: subasis3124 <subasismishra3124@gmail.com>
+Subject: feat(phase-4.6): add bus stops transit infrastructure ingestion
+
+Commit: 4875e75
+Author: subasis3124 <subasismishra3124@gmail.com>
+Committer: subasis3124 <subasismishra3124@gmail.com>
+Subject: feat(phase-4.5): add emergency public safety infrastructure
+
+Commit: b04854b
+Author: subasis3124 <subasismishra3124@gmail.com>
+Committer: subasis3124 <subasismishra3124@gmail.com>
+Subject: feat(phase-4.4): add educational infrastructure ingestion
+
