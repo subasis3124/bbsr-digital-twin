@@ -306,3 +306,57 @@ export interface OptimizationCreatePayload {
   method: "ortools_min_cost_flow" | "nearest_resource";
   save?: boolean;
 }
+
+// AI Interface Types
+export interface AIQueryRequest {
+  query: string;
+  spatial_context?: string;
+  simulation_id?: string;
+}
+
+export interface AIToolCall {
+  tool: string;
+  parameters: Record<string, any>;
+}
+
+export interface AIToolResult {
+  tool: string;
+  success: boolean;
+  data?: any;
+  error?: string;
+}
+
+export interface AIMapAction {
+  action: string;
+  layer?: string;
+  visible?: boolean;
+  bounds?: [number, number, number, number];
+  center?: [number, number];
+  zoom?: number;
+  risk?: string;
+}
+
+export interface AIProvenance {
+  data_sources: string[];
+  model_type: string;
+  timestamp: string;
+  is_synthetic: boolean;
+  scientific_validation_warning?: string;
+}
+
+export interface AIResponse {
+  query_id: string;
+  query: string;
+  answer: string;
+  intent: string;
+  response_type: "text" | "table" | "chart" | "feature_list" | "map_action" | "simulation_result" | "optimization_result";
+  tool_calls: AIToolCall[];
+  tool_results: AIToolResult[];
+  data?: Record<string, any>;
+  map_actions: AIMapAction[];
+  provenance: AIProvenance;
+  warnings: string[];
+  suggested_followups: string[];
+  created_at: string;
+}
+

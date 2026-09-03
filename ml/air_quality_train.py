@@ -25,7 +25,8 @@ from ml.air_quality_models import (
 )
 
 def setup_mlflow():
-    tracking_uri = os.getenv("MLFLOW_TRACKING_URI", "sqlite:////tmp/mlflow_bbsr.db")
+    default_db = os.path.join(os.getcwd(), "mlflow_bbsr.db").replace("\\", "/")
+    tracking_uri = os.getenv("MLFLOW_TRACKING_URI", f"sqlite:///{default_db}")
     mlflow.set_tracking_uri(tracking_uri)
     mlflow.set_experiment("Bhubaneswar_Air_Quality_Forecasting")
     print(f"MLflow configured with tracking database: {tracking_uri}")

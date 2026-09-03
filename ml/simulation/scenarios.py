@@ -36,19 +36,45 @@ class BaseScenario(ABC):
             return True
 
         loc = state.location
-        if scope.scope_type == "grid_cell" or scope.cell_codes:
+
+        if scope.scope_type == "grid_cell":
+            if not scope.cell_codes:
+                return True
             if loc.cell_code and loc.cell_code in scope.cell_codes:
                 return True
-            if loc.spatial_id in scope.cell_codes:
+            if loc.spatial_id and loc.spatial_id in scope.cell_codes:
+                return True
+            return False
+
+        if scope.scope_type == "ward":
+            if not scope.ward_ids:
+                return True
+            if loc.ward_number and loc.ward_number in scope.ward_ids:
+                return True
+            if loc.ward_id and loc.ward_id in scope.ward_ids:
+                return True
+            return False
+
+        if scope.scope_type == "road":
+            if not scope.road_ids:
+                return True
+            if loc.road_id and loc.road_id in scope.road_ids:
+                return True
+            return False
+
+        if scope.cell_codes:
+            if loc.cell_code and loc.cell_code in scope.cell_codes:
+                return True
+            if loc.spatial_id and loc.spatial_id in scope.cell_codes:
                 return True
 
-        if scope.scope_type == "ward" or scope.ward_ids:
+        if scope.ward_ids:
             if loc.ward_number and loc.ward_number in scope.ward_ids:
                 return True
             if loc.ward_id and loc.ward_id in scope.ward_ids:
                 return True
 
-        if scope.scope_type == "road" or scope.road_ids:
+        if scope.road_ids:
             if loc.road_id and loc.road_id in scope.road_ids:
                 return True
 

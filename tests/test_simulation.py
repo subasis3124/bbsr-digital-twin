@@ -322,6 +322,38 @@ def test_spatial_filtering():
     assert sim2.environment.rainfall == 0.0
 
 
+def test_empty_grid_cell_scope_affects_all_cells_and_base_state_immutability():
+    state1 = create_sample_base_state(spatial_id="CELL_001")
+    state2 = create_sample_base_state(spatial_id="CELL_002")
+
+    original_dump1 = copy.deepcopy(state1.model_dump())
+    original_dump2 = copy.deepcopy(state2.model_dump())
+
+    # Empty grid cell scope (should affect ALL grid cells)
+    scope = SpatialScope(scope_type="grid_cell", cell_codes=[])
+    params = HeavyRainfallParams(rainfall_delta_mm=50.0, spatial_scope=scope)
+    scenario = HeavyRainfallScenario(params)
+
+    sim1, _ = scenario.apply(state1)
+    sim2, _ = scenario.apply(state2)
+
+    # 1. Heavy rainfall with empty grid-cell IDs affects applicable cells
+    assert sim1.environment.rainfall == 50.0
+    assert sim2.environment.rainfall == 50.0
+
+    # 2. Impact analysis reports non-zero affected units when base state permits
+    summary = SimulationImpactAnalyzer.analyze(
+        base_states=[state1, state2],
+        simulated_states=[sim1, sim2],
+        directly_simulated_fields=["rainfall"]
+    )
+    assert summary.affected_spatial_units_count == 2
+
+    # 3. Base state remains unchanged
+    assert state1.model_dump() == original_dump1
+    assert state2.model_dump() == original_dump2
+
+
 # ==========================================
 # 9. Temporal Leakage Prevention
 # ==========================================
